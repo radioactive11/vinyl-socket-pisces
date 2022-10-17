@@ -1,6 +1,11 @@
 import axios from "axios";
+import dotenv from "dotenv";
 
-export const HOST = "https://api.vinyl.rezo.live";
+dotenv.config();
+
+console.log(process.env.API_URL,"api");
+
+export const HOST = process.env.API_URL;
 
 export const BASE_URL = `${HOST}/`;
 

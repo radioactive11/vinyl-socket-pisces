@@ -7,8 +7,6 @@ import mongoose, { ConnectOptions } from "mongoose";
 import { ErrorHandler } from "./src/middlewares/errorHandler";
 import Users from "./src/routes/Users";
 import {formatMessage} from "./src/utils/messages";
-import {createAdapter} from "@socket.io/redis-adapter";
-import * as redis from "redis";
 import axios from "axios";
 import {Tracks} from "./src/utils/tracks";
 
@@ -34,7 +32,7 @@ app.get('/', (req, res) => {
 dotenv.config();
 
 
-const PORTNUMBER: number = parseInt(process.env.PORT) || 5000;
+const PORTNUMBER: number = parseInt(process.env.PORT) || 8080;
 
 app.use("/user", Users);
 
@@ -46,7 +44,7 @@ var server = app.listen(PORTNUMBER, (): void => {
 
 var io = require("socket.io")(server,{
   cors: {
-	// origin: "http://localhost:3000/",
+	origin: process.env.CLIENT_URL,
 	methods: ["GET", "POST","PUT"]
   }
 });
@@ -58,15 +56,15 @@ let leaderBoard:any[]=[];
   // Run when client connects
 io.on("connection", (socket:any) => {
 
-	console.log("connected");
+	// console.log("connected");
 
 	socket.on("joinRoom", (data:any) => {
 	
-		console.log("joined");
+		// console.log("joined");
 
 		const user = userJoin(socket.id, data.username, data.room_id);
 
-		console.log(user,"userr");
+		// console.log(user,"userr");
 
 		//joining room using socket id
 		socket.join(user.room);
@@ -83,7 +81,7 @@ io.on("connection", (socket:any) => {
 					room_id:data.room_id,
 				})
 			
-				console.log(response.data);
+				// console.log(response.data);
 
 				const tracksRes = await API.post("/questions/create",{
 					track_ids:data.track_ids,
@@ -92,7 +90,7 @@ io.on("connection", (socket:any) => {
 	
 				const testVar = tracksSeed(tracksRes.data.questions);		 
 
-				console.log(testVar,"test");
+				// console.log(testVar,"test");
 				//socket.emit('player-joined',data.username);
 				socket.emit('player-joined',data.username);
 			}
@@ -150,16 +148,16 @@ io.on("connection", (socket:any) => {
 	//result array
 	socket.on("chatMessage", (data:any) => { 
 
-		console.log(data,"Data");
+		// console.log(data,"Data");
 		const user = getCurrentUser(socket.id);
 		API.post("/questions/check", {
 			answer:data.message,
 			question_id:data.questionId
-		}).then((res) => {
+		}).then((res:any) => {
 			let correct;
-			console.log(res.data,"Data ans");
+			// console.log(res.data,"Data ans");
 			if(res.data.result === "True"){
-				console.log("in");
+				// console.log("in");
 				
 				leaderBoard.push({key:[user.username],value:counter*10});
 
@@ -167,13 +165,13 @@ io.on("connection", (socket:any) => {
 
 			}
 			else{
-				console.log("else");
+				// console.log("else");
 				correct=false;
 			}
 			
 			io.to(user.room).emit("message", formatMessage(user.username, data.message,correct));
 
-		}).catch((err) => {
+		}).catch((err:any) => {
 			console.log(err);
 		});
 	
@@ -194,7 +192,7 @@ io.on("connection", (socket:any) => {
 				room_id:user.room,
 				scores:scores
 			})
-			console.log("score-board updating")
+			// console.log("score-board updating")
 			//socket.emit("updated-score-board",response);
 			io.to(user.room).emit("updated-score-board", response.data);
 			setTimeout(()=>{
@@ -224,7 +222,7 @@ io.on("connection", (socket:any) => {
 					room_id:user.room,
 					scores:scores
 				})
-				console.log("score-board updating")
+				// console.log("score-board updating")
 				//socket.emit("updated-score-board",response);
 				 io.to(user.room).emit("game-end", response.data);
 
@@ -245,7 +243,7 @@ io.on("connection", (socket:any) => {
 		
 
 		//broadcast particular track
-		console.log(tracks[rounds-1],"this is the track")
+		// console.log(tracks[rounds-1],"this is the track")
 		
 		 io.to(user.room).emit("tracksData", tracks[rounds-1]);
 
