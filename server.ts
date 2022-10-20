@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
 dotenv.config();
 
 
-const PORTNUMBER: number = parseInt(process.env.PORT) || 8080;
+const PORTNUMBER: number = parseInt(process.env.PORT) || 5000;
 
 app.use("/user", Users);
 
@@ -56,23 +56,15 @@ let leaderBoard:any[]=[];
   // Run when client connects
 io.on("connection", (socket:any) => {
 
-	// console.log("connected");
-
 	socket.on("joinRoom", (data:any) => {
 	
-		// console.log("joined");
-
 		const user = userJoin(socket.id, data.username, data.room_id);
-
-		// console.log(user,"userr");
 
 		//joining room using socket id
 		socket.join(user.room);
 		
 		const userName=data.username;
 		
-		
-
 		if(data.type === "admin"){
 			const addToRedis = async () => {
 			try {
@@ -81,21 +73,22 @@ io.on("connection", (socket:any) => {
 					room_id:data.room_id,
 				})
 			
-				// console.log(response.data);
+				console.log(data.track_ids,"tracks");
 
 				const tracksRes = await API.post("/questions/create",{
 					track_ids:data.track_ids,
-					room_id:data.room_id
+					room_id:data.room_id,
+					limit:data.rounds
 				})
 	
+				console.log(data.rounds,"rounds");
+				console.log(tracksRes.data,"trackss");
+
 				const testVar = tracksSeed(tracksRes.data.questions);		 
 
-				// console.log(testVar,"test");
-				//socket.emit('player-joined',data.username);
 				socket.emit('player-joined',data.username);
 			}
 			catch (err) {
-				//catch err
 				console.log(err);
 			}
 		}
