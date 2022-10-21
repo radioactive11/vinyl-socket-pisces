@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
 dotenv.config();
 
 
-const PORTNUMBER: number = parseInt(process.env.PORT) || 5000;
+const PORTNUMBER: number = parseInt(process.env.PORT) || 8080;
 
 app.use("/user", Users);
 
@@ -74,11 +74,12 @@ io.on("connection", (socket:any) => {
 				})
 			
 				console.log(data.track_ids,"tracks");
-
+				data.track_ids.sort( () => Math.random() - 0.5) ;
+				data.track_ids = data.track_ids.slice(0, data.rounds)
 				const tracksRes = await API.post("/questions/create",{
 					track_ids:data.track_ids,
 					room_id:data.room_id,
-					limit:data.rounds
+					limit: data.rounds
 				})
 	
 				console.log(data.rounds,"rounds");
