@@ -239,10 +239,20 @@ io.on("connection", (socket:any) => {
 		//broadcast particular track
 		// console.log(tracks[rounds-1],"this is the track")
 		
-		 io.to(user.room).emit("tracksData", tracks[rounds-1]);
+		 io.to(user.room).emit("tracksData", {
+			name: 'Paradise',
+			image: 'https://c.saavncdn.com/524/Duck-Duck-Goose-English-2018-20180910145221-150x150.jpg',
+			url: 'https://discord.com/channels/871306487568412692/871337440462389278/1058813086733193336',
+			question_id: 'mY1CxHIY'
+		  });
 
 		 setTimeout(()=>{
-			io.to(user.room).emit("tracksData", tracks[rounds-1]);
+			io.to(user.room).emit("tracksData", {
+				name: 'Paradise',
+				image: 'https://c.saavncdn.com/524/Duck-Duck-Goose-English-2018-20180910145221-150x150.jpg',
+				url: 'https://discord.com/channels/871306487568412692/871337440462389278/1058813086733193336',
+				question_id: 'mY1CxHIY'
+			  });
 		 },1500)
 
 		var roundCountdown = setInterval(async() => {
